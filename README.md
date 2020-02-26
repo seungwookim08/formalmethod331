@@ -1,1 +1,2 @@
-# formalmethod331
+# Formal Method for Software Engineering
+Prolog assignment. 
