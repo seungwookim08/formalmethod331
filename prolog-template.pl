@@ -73,7 +73,7 @@ init_state('Navigation', 'Idle navigation').
 init_state('Changing lane', 'Idle changing lane').
 
 %% superstate: superstate(superstate, substate)
-superstate(idle,null)
+superstate(idle,null).
 
 superstate(manual, 'Driving mode').
 superstate(manual, 'Break mode').
