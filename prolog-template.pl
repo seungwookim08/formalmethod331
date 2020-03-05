@@ -36,7 +36,7 @@ state('Break mode').
 state('Tailing').
 state('Maintaining speed').
 state('Avoid obstacles').
-state(Navigation).
+state('Navigation').
 state('Changing lane').
 
 %% states under Maintaining speed
@@ -81,7 +81,7 @@ superstate(manual, 'Break mode').
 superstate(cruise, 'Tailing').
 superstate(cruise, 'Maintaining speed').
 superstate(cruise, 'Avoid obstacles').
-superstate(cruise, Navigation).
+superstate(cruise, 'Navigation').
 superstate(cruise, 'Changing lane').
 
 superstate('Maintaining speed', 'Staying mode').
@@ -94,9 +94,9 @@ superstate('Avoid obstacles', 'Avoid mode').
 superstate('Avoid obstacles', 'Changing lane').
 superstate('Avoid obstacles', 'Exit avoid obstacle mode').
 
-superstate(Navigation, 'Idle navigation').
-superstate(Navigation, 'Changing lane').
-superstate(Navigation, 'Arrived at Destination').
+superstate('Navigation', 'Idle navigation').
+superstate('Navigation', 'Changing lane').
+superstate('Navigation', 'Arrived at Destination').
 
 superstate('Changing lane', 'Idle changing lane').
 superstate('Changing lane', 'Left mode').
@@ -117,8 +117,25 @@ superstate('Changing lane', 'Panic mode').
 %% transition rule (receiving two statese, and returns transitions between them):
 %% transition(state1, state2) -> (return <event, guard, action>
 
+connected(X,Y) :- superstate(X,Y) ; superstate(Y,X).
+
+transition(X,Y) :- connected(X,Y).
+
+transition(X,Y,Path) :-
+       travel(X,Y,[X],Q), 
+       reverse(Q,Path).
+
+travel(X,Y,P,[Y|P]) :- 
+       connected(X,Y).
+
+travel(X,Y,Visited,Path) :-
+       connected(X,Z),           
+       Z \== Y,
+       \+member(Z,Visited),
+       travel(Z,Y,[Z|Visited],Path).
+
+
 
 %% interface rule (returns all state/event pairs): interface() -> (return <state, event>)
-
 
 %% eof.
