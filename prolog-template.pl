@@ -4,7 +4,7 @@
 %%  Department of Computer Science and Software Engineering
 %%  SOEN 331-..:  Assignment ..
 %%  Winter term, 2020
-%%  Date submitted: March 3rd, 2020
+%%  Date submitted: March 6th, 2020
 %%
 %%  Authors:
 %%
