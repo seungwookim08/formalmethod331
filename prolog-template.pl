@@ -71,7 +71,7 @@ init_state('Avoid obstacles', 'Idle-obstacle').
 init_state('Navigation', 'Idle-navigation').
 init_state('Changing lane', 'Idle-changing lane').
 
-%% superstate: superstate(superstate, substate)
+%% superstate facts: superstate(superstate, substate)
 superstate('root','Idle').
 superstate('root','Parked').
 superstate('root','Manual').
@@ -109,7 +109,7 @@ superstate('Changing lane', 'Left mode').
 superstate('Changing lane', 'Right mode').
 superstate('Changing lane', 'Panic').
 
-%% transitions: trans(source, destination, event, guard, action).
+%% transition fact: trans(source, destination, event, guard, action).
 trans('Idle', 'Parked', 'start the car', null, 'engine to idle; engine=idle; ready to drive').
 trans('Parked', 'Parked', 'use navigation system', null, 'set the destination; destination is set').
 trans('Parked', 'Manual', 'issue drive signal option', 'engine is idle', null).
@@ -180,12 +180,12 @@ trans('Idle-lane' , 'Panic', 'obstacle found', 'distance - distanceLimit < 0; le
 transition(S, D, L):- findall([E,G,A],
                         trans(S, D,E,G,A),
                         L).
+%% interface rule (returns all state/event pairs): interface(). (return <state, event>)
 
 interface(S):- findall([S,E],
                         trans(S,_,E,_,_),
                         L),
                         list_to_set(L,S).
 
-%% interface rule (returns all state/event pairs): interface(). (return <state, event>)
 
 %% eof.
