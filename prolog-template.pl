@@ -22,17 +22,18 @@
 %% =============================================================================
 
 %% states list (top-level)
-state(idle).
-state(parked).
-state(manual).
-state(cruise).
-state(panic).
+state('Idle').
+state('Parked').
+state('Manual').
+state('Cruise').
+state('Panic').
+state('Turned Off').
 
 %% states under manual
 state('Driving mode').
 state('Break mode').
 
-%% states under cruise
+%% states under 'Cruise'
 state('Tailing').
 state('Maintaining speed').
 state('Avoid obstacles').
@@ -45,68 +46,85 @@ state('Speed up mode').
 state('Speed down mode').
 
 %% states under Avoid obstacles
-state('Idle obstacle').
+state('Idle-obstacle').
 state('Normal mode').
-state('Avoid mode').
+state('Tailgating').
 state('Changing lane').
-state('Exit avoid obstacle mode').
 
 %% states under Navigation
-state('Idle navigation').
+state('Idle-navigation').
 state('Changing lane').
 state('Arrived at Destination').
 
 %% states under Changing lane
-state('Idle changing lane').
+state('Idle-lane').
 state('Left mode').
 state('Right mode').
 state('Cruise mode').
-state('Panic mode').
 
 %% initial states: init_state(composite state, initial state)
-init_state(idle, null).
-init_state(manual,'Driving mode').
-init_state(cruise,'Tailing').
+init_state('Idle', null).
+init_state('Manual','Driving mode').
+init_state('Cruise','Tailing').
 init_state('Maintaining speed', 'Staying mode').
-init_state('Avoid obstacles', 'Idle obstacle').
-init_state('Navigation', 'Idle navigation').
-init_state('Changing lane', 'Idle changing lane').
+init_state('Avoid obstacles', 'Idle-obstacle').
+init_state('Navigation', 'Idle-navigation').
+init_state('Changing lane', 'Idle-changing lane').
 
 %% superstate: superstate(superstate, substate)
-superstate(idle,null).
+superstate(null,'Idle').
+superstate(null,'Parked').
+superstate(null,'Manual').
+superstate(null,'Cruise').
+superstate(null,'Panic').
+superstate(null,'Turned Off').
 
-superstate(manual, 'Driving mode').
-superstate(manual, 'Break mode').
+superstate('Idle',null).
+superstate('Turned Off',null).
 
-superstate(cruise, 'Tailing').
-superstate(cruise, 'Maintaining speed').
-superstate(cruise, 'Avoid obstacles').
-superstate(cruise, 'Navigation').
-superstate(cruise, 'Changing lane').
+superstate('Manual', 'Driving mode').
+superstate('Manual', 'Break mode').
+
+superstate('Cruise', 'Tailing').
+superstate('Cruise', 'Maintaining speed').
+superstate('Cruise', 'Avoid obstacles').
+superstate('Cruise', 'Navigation').
+superstate('Cruise', 'Changing lane').
 
 superstate('Maintaining speed', 'Staying mode').
 superstate('Maintaining speed', 'Speed up mode').
 superstate('Maintaining speed', 'Speed down mode').
 
-superstate('Avoid obstacles', 'Idle obstacle').
+superstate('Avoid obstacles', 'Idle-obstacle').
 superstate('Avoid obstacles', 'Normal mode').
-superstate('Avoid obstacles', 'Avoid mode').
+superstate('Avoid obstacles', 'Tailgating').
 superstate('Avoid obstacles', 'Changing lane').
 superstate('Avoid obstacles', 'Exit avoid obstacle mode').
 
-superstate('Navigation', 'Idle navigation').
+superstate('Navigation', 'Idle-navigation').
 superstate('Navigation', 'Changing lane').
 superstate('Navigation', 'Arrived at Destination').
 
-superstate('Changing lane', 'Idle changing lane').
+superstate('Changing lane', 'Idle-lane').
 superstate('Changing lane', 'Left mode').
 superstate('Changing lane', 'Right mode').
 superstate('Changing lane', 'Cruise mode').
-superstate('Changing lane', 'Panic mode').
 
-%% transitions: transition(source, destination, event, guard, action).
-
-
+%% transitions: trans(source, destination, event, guard, action).
+trans('Idle', 'Parked', 'start the car', null, 'engine to idle, engine=idle, ready to drive').
+trans('Parked', 'Parked', 'use navigation system', null, 'set the destination; destination is set').
+trans('Parked', 'Manual', 'issue drive signal option', 'engine is idle', null).
+trans('Parked', 'Cruise', 'initiate cruise mode', 'destination is set', null).
+trans('Parked', 'Parked', 'issue manual drive option', 'destination is unset', 'beep').  
+trans('Manual', 'Cruise', 'switch to cruise', 'destination is set', null).
+trans('Manual', 'Cruise', 'switch to cruise', 'destination is unset', 'beep').
+trans('Cruise', 'Manual', 'switch back to manual', 'destination is set' , null ).
+trans('Manual', 'Parked', 'put car in parked', null ,'car is stopped'). 
+trans('Cruise', 'Panic', 'unforseen event', null, 'hazard signal on' ).  
+trans('Cruise', 'Parked', 'arrived to the destination', null, 'car is stopped' ). 
+trans('Cruise', 'Panic', 'turn on panic mode manually', null , 'hazard signal on' ).  
+trans('Panic', 'Parked', 'switch off panic mode', null , 'hazard signal off' ).
+trans('Parked', 'Turned Off' , 'shut off engine', null ,'engine is not idle' ). 
 
 %% =============================================================================
 %%
@@ -115,27 +133,20 @@ superstate('Changing lane', 'Panic mode').
 %% =============================================================================
 
 %% transition rule (receiving two statese, and returns transitions between them):
-%% transition(state1, state2) -> (return <event, guard, action>
+%% transition(state1, state2). (return <event, guard, action>
 
 connected(X,Y) :- superstate(X,Y) ; superstate(Y,X).
 
-transition(X,Y) :- connected(X,Y).
+transition(S, D):- findall([E,G,A],
+                        trans(S, D,E,G,A),
+                        L),
+    		        list_to_set(L,S).
 
-transition(X,Y,Path) :-
-       travel(X,Y,[X],Q), 
-       reverse(Q,Path).
+interface(S):- findall([S,E],
+                        trans(S,_,E,_,_),
+                        L),
+                        list_to_set(L,S).
 
-travel(X,Y,P,[Y|P]) :- 
-       connected(X,Y).
-
-travel(X,Y,Visited,Path) :-
-       connected(X,Z),           
-       Z \== Y,
-       \+member(Z,Visited),
-       travel(Z,Y,[Z|Visited],Path).
-
-
-
-%% interface rule (returns all state/event pairs): interface() -> (return <state, event>)
+%% interface rule (returns all state/event pairs): interface(). (return <state, event>)
 
 %% eof.
