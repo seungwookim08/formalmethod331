@@ -72,12 +72,12 @@ init_state('Navigation', 'Idle-navigation').
 init_state('Changing lane', 'Idle-changing lane').
 
 %% superstate: superstate(superstate, substate)
-superstate(null,'Idle').
-superstate(null,'Parked').
-superstate(null,'Manual').
-superstate(null,'Cruise').
-superstate(null,'Panic').
-superstate(null,'Turned Off').
+superstate('root','Idle').
+superstate('root','Parked').
+superstate('root','Manual').
+superstate('root','Cruise').
+superstate('root','Panic').
+superstate('root','Turned Off').
 
 superstate('Idle',null).
 superstate('Turned Off',null).
@@ -177,12 +177,9 @@ trans('Idle-lane' , 'Panic', 'obstacle found', 'distance - distanceLimit < 0; le
 %% transition rule (receiving two statese, and returns transitions between them):
 %% transition(state1, state2). (return <event, guard, action>
 
-connected(X,Y) :- superstate(X,Y) ; superstate(Y,X).
-
-transition(S, D):- findall([E,G,A],
-                        (trans(S, D,E,G,A)),
-                        L),
-    		        list_to_set(L,S).
+transition(S, D, L):- findall([E,G,A],
+                        trans(S, D,E,G,A),
+                        L).
 
 interface(S):- findall([S,E],
                         trans(S,_,E,_,_),
