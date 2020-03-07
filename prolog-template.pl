@@ -54,7 +54,7 @@ state('Changing lane').
 %% states under Navigation
 state('Idle-navigation').
 state('Changing lane').
-state('Arrived at Destination').
+state('Driving-navigation').
 
 %% states under Changing lane
 state('Idle-lane').
@@ -100,9 +100,9 @@ superstate('Avoid obstacles', 'Normal mode').
 superstate('Avoid obstacles', 'Tailgating').
 superstate('Avoid obstacles', 'Changing lane').
 
-superstate('Navigation', 'Idle-navigation').
+superstate('Navigation', 'Driving-navigation').
 superstate('Navigation', 'Changing lane').
-superstate('Navigation', 'Arrived at Destination').
+
 
 superstate('Changing lane', 'Idle-lane').
 superstate('Changing lane', 'Left mode').
@@ -148,14 +148,15 @@ trans('Tailgating', 'Normal mode', null, 'distance - distanceLimit > 0; obstacle
 trans('Normal mode', 'Tailgating', null, 'distance - distanceLimit <= 0; obstacle is moving] / decrease actualSpeed', null).
 trans('Normal mode','Changing lane', 'changing lane signal', 'distance - distanceLimit <= 0; obstacle is not moving',null).
 
-trans('Idle-navigation', 'Idle-navigation', 'after(1 sec)', null, null).
-trans('Idle-navigation', 'Changing lane', 'after(1 sec) Turn left-most lane ahead', null, 'targetLane`=1').
-trans('Idle-navigation', 'Changing lane', 'after(1 sec) Turn right-most lane ahead', null, 'tagetLane`=maximumLane').
-trans('Changing lane', 'Idle-navigation', 'after(1 sec)','targetLane == currentLane', null).
-trans('Idle-navigation', 'Idle-navigation','after(1 sec) Turn left',null, 'car to turn left').
-trans('Idle-navigation', 'Idle-navigation','after(1 sec) Turn right', null,'car to turn right').
-trans('Idle-navigation', 'Changing lane','after(1 sec) Destination ahead', null, 'targetLane`=maximumLane').
-trans('Idle-navigation', 'Arrived at Destination','after(1 sec) arrived at destination', null, 'actualSpeed`=0; car is stopped').
+trans("Driving-navigation","Idle-navigation","after(1 sec)", null, null).
+trans("Idle-navigation","Driving-navigation","Turn right",null,"car to turn right").
+trans("Idle-navigation","Driving-navigation","Turn left",null,"car to turn left",).
+trans("Idle-navigation","Driving-navigation","normal driving signal", null,).
+trans("Idle-navigation","Changing Lane","Turn right-most lane ahead", null, "targetLane' = maximumLane").
+trans("Idle-navigation","Changing Lane","Turn left-most lane ahead", null, "targetLane' = 1").
+trans("Idle-navigation","Changing Lane","Destination ahead", null, "targetLane' = maximumLane").
+trans("Driving-navigation","Arrived at destination state","after (1 sec)", null, "arrived at destination").
+trans("Changing Lane","Driving-navigation",null,"targetLane = currentLane", null).
 
 trans('Idle-lane' , 'Idle-lane', null, 'targetLane = currentLane', null).
 trans('Idle-lane' , 'Left mode', null, 'targetLane < currentLane', null). 
