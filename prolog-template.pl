@@ -46,8 +46,8 @@ state('Speed up mode').
 state('Speed down mode').
 
 %% states under Avoid obstacles
-state('Idle-obstacle').
-state('Normal mode').
+state('Caclulate coordinates').
+state('Maintain Actual Speed').
 state('Tailgating').
 state('Changing lane').
 
@@ -96,8 +96,8 @@ superstate('Maintaining speed', 'Staying mode').
 superstate('Maintaining speed', 'Speed up mode').
 superstate('Maintaining speed', 'Speed down mode').
 
-superstate('Avoid obstacles', 'Idle-obstacle').
-superstate('Avoid obstacles', 'Normal mode').
+superstate('Avoid obstacles', 'Calculate coordinates').
+superstate('Avoid obstacles', 'Maintain Actual Speed').
 superstate('Avoid obstacles', 'Tailgating').
 superstate('Avoid obstacles', 'Changing lane').
 
@@ -150,15 +150,21 @@ trans('Tailgating', 'Normal mode', null, 'distance - distanceLimit > 0; obstacle
 trans('Normal mode', 'Tailgating', null, 'distance - distanceLimit <= 0; obstacle is moving] / decrease actualSpeed', null).
 trans('Normal mode','Changing lane', 'changing lane signal', 'distance - distanceLimit <= 0; obstacle is not moving',null).
 
-trans("Driving-navigation","Idle-navigation","after(1 sec)", null, null).
-trans("Idle-navigation","Driving-navigation","Turn right",null,"car to turn right").
-trans("Idle-navigation","Driving-navigation","Turn left",null,"car to turn left",).
-trans("Idle-navigation","Driving-navigation","normal driving signal", null,).
-trans("Idle-navigation","Changing Lane","Turn right-most lane ahead", null, "targetLane' = maximumLane").
-trans("Idle-navigation","Changing Lane","Turn left-most lane ahead", null, "targetLane' = 1").
-trans("Idle-navigation","Changing Lane","Destination ahead", null, "targetLane' = maximumLane").
-trans("Driving-navigation","Arrived at destination state","after (1 sec)", null, "Arrived at Destination").
-trans("Changing Lane","Driving-navigation",null,"targetLane = currentLane", null).
+trans('Caclulate coordinates','Maintain Actual Speed',null,'distance - distanceLimit > 0', null).
+trans('Caclulate coordinates','Tailgating',null,'distance - distanceLimit <= 0; obstacle is not moving', 'decrease actualSpeed').
+trans('Caclulate coordinates','Changing Lane','changing lane signal','distance - distanceLimit <= 0; obstacle is not moving', null).
+trans('Maintain Actual Speed','Calculating coordinates','after(1 sec)', 'update distance', 'distance to be updated').
+trans('Tailgating','Calculating coordinates','after(1 sec)', 'update distance', 'distance to be updated').
+
+trans('Driving-navigation','Idle-navigation','after(1 sec)', null, null).
+trans('Idle-navigation','Driving-navigation','Turn right',null,'car to turn right').
+trans('Idle-navigation','Driving-navigation','Turn left',null,'car to turn left',).
+trans('Idle-navigation','Driving-navigation','normal driving signal', null,null).
+trans('Idle-navigation','Changing Lane','Turn right-most lane ahead', null, 'targetLane` = maximumLane').
+trans('Idle-navigation','Changing Lane','Turn left-most lane ahead', null, 'targetLane` = 1').
+trans('Idle-navigation','Changing Lane','Destination ahead', null, 'targetLane` = maximumLane').
+trans('Driving-navigation','Arrived at destination state','after (1 sec)', null, 'Arrived at Destination').
+trans('Changing Lane','Driving-navigation',null,'targetLane = currentLane', null).
 
 trans('Idle-lane' , 'Idle-lane', null, 'targetLane = currentLane', null).
 trans('Idle-lane' , 'Left mode', null, 'targetLane < currentLane', null). 
