@@ -143,13 +143,6 @@ trans('Changing lane', 'Tailing', null, 'currentLane = targetLane', null).
 trans('Staying mode', 'Speed down mode', 'issue accelerate', '(actualSpeed-desiredSpeed)/desiredSpeed > 0.05', 'decrease actualSpeed').
 trans('Staying mode', 'Speed up mode', 'issue decelerate', '(actualSpeed-desiredSpeed)/desiredSpeed < -0.05', 'increase actualSpeed').
 
-trans('Idle-obstacle', 'Normal mode', null, 'distance - distanceLimit > 0', null).
-trans('Idle-obstacle', 'Tailgating', null, 'distance - distanceLimit <= 0; obstacle is not moving', 'decrease actualSpeed').
-trans('Idle-obstacle', 'Changing lane', 'changing lane signal', 'distance - distanceLimit <= 0; obstacle is moving', null).
-trans('Tailgating', 'Normal mode', null, 'distance - distanceLimit > 0; obstacle is moving', null).
-trans('Normal mode', 'Tailgating', null, 'distance - distanceLimit <= 0; obstacle is moving] / decrease actualSpeed', null).
-trans('Normal mode','Changing lane', 'changing lane signal', 'distance - distanceLimit <= 0; obstacle is not moving',null).
-
 trans('Caclulate coordinates','Maintain Actual Speed',null,'distance - distanceLimit > 0', null).
 trans('Caclulate coordinates','Tailgating',null,'distance - distanceLimit <= 0; obstacle is not moving', 'decrease actualSpeed').
 trans('Caclulate coordinates','Changing Lane','changing lane signal','distance - distanceLimit <= 0; obstacle is not moving', null).
