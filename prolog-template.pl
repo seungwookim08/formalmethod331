@@ -151,7 +151,7 @@ trans('Tailgating','Calculating coordinates','after(1 sec)', 'update distance', 
 
 trans('Driving-navigation','Idle-navigation','after(1 sec)', null, null).
 trans('Idle-navigation','Driving-navigation','Turn right',null,'car to turn right').
-trans('Idle-navigation','Driving-navigation','Turn left',null,'car to turn left',).
+trans('Idle-navigation','Driving-navigation','Turn left',null,'car to turn left').
 trans('Idle-navigation','Driving-navigation','normal driving signal', null,null).
 trans('Idle-navigation','Changing Lane','Turn right-most lane ahead', null, 'targetLane` = maximumLane').
 trans('Idle-navigation','Changing Lane','Turn left-most lane ahead', null, 'targetLane` = 1').
