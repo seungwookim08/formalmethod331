@@ -55,6 +55,7 @@ state('Changing lane').
 state('Idle-navigation').
 state('Changing lane').
 state('Driving-navigation').
+state('Arrived at Destination').
 
 %% states under Changing lane
 state('Idle-lane').
@@ -102,6 +103,7 @@ superstate('Avoid obstacles', 'Changing lane').
 
 superstate('Navigation', 'Driving-navigation').
 superstate('Navigation', 'Changing lane').
+superstate('Navigation', 'Arrived at Destination').
 
 
 superstate('Changing lane', 'Idle-lane').
@@ -155,7 +157,7 @@ trans("Idle-navigation","Driving-navigation","normal driving signal", null,).
 trans("Idle-navigation","Changing Lane","Turn right-most lane ahead", null, "targetLane' = maximumLane").
 trans("Idle-navigation","Changing Lane","Turn left-most lane ahead", null, "targetLane' = 1").
 trans("Idle-navigation","Changing Lane","Destination ahead", null, "targetLane' = maximumLane").
-trans("Driving-navigation","Arrived at destination state","after (1 sec)", null, "arrived at destination").
+trans("Driving-navigation","Arrived at destination state","after (1 sec)", null, "Arrived at Destination").
 trans("Changing Lane","Driving-navigation",null,"targetLane = currentLane", null).
 
 trans('Idle-lane' , 'Idle-lane', null, 'targetLane = currentLane', null).
