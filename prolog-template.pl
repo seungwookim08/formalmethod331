@@ -86,7 +86,7 @@ superstate('Turned Off',null).
 superstate('Manual', 'Driving mode').
 superstate('Manual', 'Break mode').
 
-superstate('Cruise', 'Tailing').
+superstate('Cruise', 'Crusing').
 superstate('Cruise', 'Maintaining speed').
 superstate('Cruise', 'Avoid obstacles').
 superstate('Cruise', 'Navigation').
@@ -127,11 +127,13 @@ trans('Cruise', 'Panic', 'turn on panic mode manually', null , 'hazard signal on
 trans('Panic', 'Parked', 'switch off panic mode', null , 'hazard signal off' ).
 trans('Parked', 'Turned Off' , 'shut off engine', null ,'engine is not idle' ). 
 
-trans('Break Mode', 'Driving mode', 'accelerate', null, 'increase actualSpeed; car is run').
-trans('Driving Mode', 'Driving Mode', 'accelerate', null, 'increase actualSpeed').
-trans('Driving Mode', 'Driving Mode', 'decelerate', null, 'decrease actualSpeed').
-trans('Driving Mode', 'Break mode', 'break', null, 'actualSpeed`=0; car is stopped').
+trans('Driving mode', 'Driving mode', 'accelerate', null, 'increase actualSpeed').
+trans('Driving mode', 'Driving mode', 'decelerate', null, 'decrease actualSpeed').
+trans('Driving mode', 'Break mode', 'break', null, 'actualSpeed`=0; car is stopped').
+trans('Break mode', 'Driving mode', 'accelerate', null, 'increase actualSpeed; actualSpeed`=0; car is running').
 
+trans('Crusing', 'Tailing', null, 'currentLane = targetLane', null).
+trans('Crusing', 'Changing lane', null, 'currentLane != targetLane', null).
 trans('Tailing', 'Maintaining speed', null, '|actualSpeed-desiredSpeed|/desiredSpeed > 0.05', null).
 trans('Maintaining speed', 'Tailing', null, '|actualSpeed-desiredSpeed|/desiredSpeed <= 0.05', null).
 trans('Tailing', 'Avoiding obstacles', 'detecting an obstacle', null, null).
